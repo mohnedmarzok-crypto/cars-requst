@@ -38,10 +38,14 @@ select.drv-sel{padding:4px 7px;font-size:12px;border-radius:8px;border:1px solid
 .land-grid{display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:start}
 @media(max-width:640px){.land-grid{grid-template-columns:1fr}}
 .auth-card{background:#fff;border:1px solid #E5E5E2;border-radius:12px;padding:20px}
+.auth-tabs{display:flex;gap:8px;margin-bottom:16px;border-bottom:1px solid #E5E5E2;padding-bottom:10px}
+.auth-tab{padding:6px 12px;font-size:13px;font-weight:500;border:none;background:none;cursor:pointer;color:#888780}
+.auth-tab.active{color:#185FA5;border-bottom:2px solid #185FA5}
 .form-grp{margin-bottom:11px}
 .form-lbl{font-size:12px;color:#5F5E5A;display:block;margin-bottom:4px;font-weight:500}
 .form-inp{width:100%;padding:9px 11px;border-radius:8px;border:1px solid #D3D1C7;background:#fff;color:#1A1A18;font-size:13px;font-family:inherit}
 .err-msg{background:#FCEBEB;color:#791F1F;border:1px solid #F7C1C1;border-radius:8px;padding:9px 12px;font-size:12px;margin-bottom:10px}
+.ok-msg{background:#EAF3DE;color:#27500A;border:1px solid #C0DD97;border-radius:8px;padding:9px 12px;font-size:12px;margin-bottom:10px}
 .hint-box{background:#F5F5F3;border-radius:8px;padding:10px 14px;font-size:12px;color:#5F5E5A;margin-top:14px;line-height:1.8;border:1px solid #E5E5E2}
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;z-index:200}
 .modal-box{background:#fff;border:1px solid #E5E5E2;border-radius:12px;padding:20px;width:360px;box-shadow:0 8px 32px rgba(0,0,0,.15)}
@@ -71,20 +75,21 @@ select.drv-sel{padding:4px 7px;font-size:12px;border-radius:8px;border:1px solid
 
   window.fb = { db, collection, addDoc, updateDoc, doc };
 
-  // تسجيل الـ Service Worker للإشعارات في الخلفية
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/firebase-messaging-sw.js')
-      .then(reg => console.log('Service Worker Registered', reg))
-      .catch(err => console.error('SW Reg Error:', err));
+    navigator.serviceWorker.register('/firebase-messaging-sw.js').catch(()=>{});
   }
 
+  // الاستماع لقائمة المستخدمين المسجلين في Firebase
+  onSnapshot(collection(db, "users"), (snapshot) => {
+    S.dbUsers = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    render();
+  });
+
   let isFirstLoad = true;
-  const reqsRef = collection(db, "requests");
-  onSnapshot(reqsRef, (snapshot) => {
+  onSnapshot(collection(db, "requests"), (snapshot) => {
     const prevCount = S.reqs.length;
     S.reqs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-    // تشغيل الصوت والإشعار عند إضافة طلب جديد
     if (!isFirstLoad && S.reqs.length > prevCount) {
       playBeepSound();
       showPushNotification("تحديث جديد!", "تم إضافة طلب سيارة جديد في النظام.");
@@ -95,21 +100,29 @@ select.drv-sel{padding:4px 7px;font-size:12px;border-radius:8px;border:1px solid
 </script>
 
 <script>
-const USERS=[
-  {id:1,name:'أحمد الموظف',email:'ahmed@company.com',pass:'Emp@1234',role:'employee'},
-  {id:2,name:'فاطمة الموظفة',email:'fatima@company.com',pass:'Emp@1234',role:'employee'},
-  {id:4,name:'محمد الإداري',email:'admin@company.com',pass:'Admin@1234',role:'admin'},
-  {id:5,name:'عمر السائق',email:'omar@company.com',pass:'Driver@1234',role:'driver'},
-  {id:6,name:'جمال السائق',email:'jamal@company.com',pass:'Driver@1234',role:'driver'},
+const INITIAL_USERS=[
+  {id:'u1',name:'أحمد الموظف',email:'ahmed@company.com',pass:'Emp@1234',role:'employee'},
+  {id:'u2',name:'فاطمة الموظفة',email:'fatima@company.com',pass:'Emp@1234',role:'employee'},
+  {id:'u4',name:'محمد الإداري',email:'admin@company.com',pass:'Admin@1234',role:'admin'},
+  {id:'u5',name:'عمر السائق',email:'omar@company.com',pass:'Driver@1234',role:'driver'},
+  {id:'u6',name:'جمال السائق',email:'jamal@company.com',pass:'Driver@1234',role:'driver'},
 ];
-const DRIVERS=[
-  {id:1,userId:5,name:'عمر السائق'},
-  {id:2,userId:6,name:'جمال السائق'},
-];
+
+// استرجاع جلسة الدخول من localStorage
+const savedUser = JSON.parse(localStorage.getItem('car_app_user') || 'null');
+
 const S={
-  user:null,form:{email:'',pass:''},msg:{err:''},
-  showModal:false,reqs:[]
+  user: savedUser,
+  authMode: 'login', // 'login' or 'register'
+  msg: {err:'', ok:''},
+  showModal: false,
+  reqs: [],
+  dbUsers: []
 };
+
+function getAllUsers() {
+  return [...INITIAL_USERS, ...S.dbUsers];
+}
 
 function playBeepSound(){
   try {
@@ -127,7 +140,7 @@ function playBeepSound(){
 }
 
 function showPushNotification(title, body) {
-  if (Notification.permission === "granted") {
+  if (Notification.permission === "granted" && navigator.serviceWorker) {
     navigator.serviceWorker.ready.then(registration => {
       registration.showNotification(title, {
         body: body,
@@ -140,11 +153,7 @@ function showPushNotification(title, body) {
 
 function requestNotifPermission() {
   if ("Notification" in window) {
-    Notification.requestPermission().then(permission => {
-      if (permission === "granted") {
-        console.log("Notification permission granted.");
-      }
-    });
+    Notification.requestPermission();
   }
 }
 
@@ -165,6 +174,7 @@ function render(){
 }
 
 function renderHome(){
+  const isLogin = S.authMode === 'login';
   return`
 <div class="land">
   <div class="land-grid">
@@ -173,9 +183,9 @@ function renderHome(){
         <div class="hdr-icon ic-b">🚗</div>
         <div style="font-size:20px;font-weight:500;color:#1A1A18">نظام إدارة طلبات السيارات</div>
       </div>
-      <p style="font-size:13px;color:#5F5E5A;line-height:1.6;margin-bottom:16px">نظام متكامل ومربوط لحظياً لنقل الطلبات والإشعارات الصوتية</p>
+      <p style="font-size:13px;color:#5F5E5A;line-height:1.6;margin-bottom:16px">نظام متكامل مع حفظ الجلسة وتسجيل الحسابات الجديدة</p>
       <div class="hint-box">
-        <b>حسابات الدخول:</b><br>
+        <b>الحسابات الافتراضية:</b><br>
         إداري: admin@company.com / Admin@1234<br>
         موظف: ahmed@company.com / Emp@1234<br>
         سائق: omar@company.com / Driver@1234
@@ -183,13 +193,34 @@ function renderHome(){
     </div>
     <div>
       <div class="auth-card">
-        <div class="auth-title">تسجيل الدخول</div>
+        <div class="auth-tabs">
+          <button class="auth-tab ${isLogin?'active':''}" onclick="setAuthMode('login')">تسجيل الدخول</button>
+          <button class="auth-tab ${!isLogin?'active':''}" onclick="setAuthMode('register')">حساب جديد</button>
+        </div>
         ${S.msg.err?`<div class="err-msg">${S.msg.err}</div>`:''}
-        <div class="form-grp"><label class="form-lbl">البريد الإلكتروني</label>
-        <input class="form-inp" type="email" id="f-email" placeholder="example@company.com"/></div>
-        <div class="form-grp"><label class="form-lbl">كلمة المرور</label>
-        <input class="form-inp" type="password" id="f-pass" placeholder="••••••••"/></div>
-        <button class="btn btn-blue btn-full" onclick="doLogin()">دخول</button>
+        ${S.msg.ok?`<div class="ok-msg">${S.msg.ok}</div>`:''}
+        
+        ${isLogin ? `
+          <div class="form-grp"><label class="form-lbl">البريد الإلكتروني</label>
+          <input class="form-inp" type="email" id="f-email" placeholder="example@company.com"/></div>
+          <div class="form-grp"><label class="form-lbl">كلمة المرور</label>
+          <input class="form-inp" type="password" id="f-pass" placeholder="••••••••"/></div>
+          <button class="btn btn-blue btn-full" onclick="doLogin()">دخول</button>
+        ` : `
+          <div class="form-grp"><label class="form-lbl">الاسم الكامل</label>
+          <input class="form-inp" type="text" id="r-name" placeholder="أدخل اسمك الكامل"/></div>
+          <div class="form-grp"><label class="form-lbl">البريد الإلكتروني</label>
+          <input class="form-inp" type="email" id="r-email" placeholder="example@company.com"/></div>
+          <div class="form-grp"><label class="form-lbl">كلمة المرور</label>
+          <input class="form-inp" type="password" id="r-pass" placeholder="••••••••"/></div>
+          <div class="form-grp"><label class="form-lbl">نوع الحساب</label>
+          <select class="form-inp" id="r-role">
+            <option value="employee">موظف (تقديم طلبات)</option>
+            <option value="driver">سائق (تنفيذ رحلات)</option>
+            <option value="admin">إداري (موافقة وتعيين)</option>
+          </select></div>
+          <button class="btn btn-green btn-full" onclick="doRegister()">إنشاء الحساب</button>
+        `}
       </div>
     </div>
   </div>
@@ -223,6 +254,7 @@ function renderEmployee(){
 }
 
 function renderAdmin(){
+  const drivers = getAllUsers().filter(u => u.role === 'driver');
   return`
 <div class="hdr">
   <div class="hdr-brand"><div class="hdr-icon ic-p">🛡️</div><div><div class="hdr-title">لوحة الإداري</div></div></div>
@@ -235,7 +267,7 @@ function renderAdmin(){
       <td>${r.empName}</td>
       <td>${r.from} → ${r.to}</td>
       <td>${bdg(r.status)}</td>
-      <td>${r.status==='pending'?`<select class="drv-sel" id="ds-${r.id}"><option value="">اختر سائق</option>${DRIVERS.map(d=>`<option value="${d.userId}">${d.name}</option>`).join('')}</select>`:(r.driverName||'—')}</td>
+      <td>${r.status==='pending'?`<select class="drv-sel" id="ds-${r.id}"><option value="">اختر سائق</option>${drivers.map(d=>`<option value="${d.id}">${d.name}</option>`).join('')}</select>`:(r.driverName||'—')}</td>
       <td>${r.status==='pending'?`<button class="btn btn-green btn-sm" onclick="approve('${r.id}')">موافقة وتحويل</button>`:'تم'}</td>
     </tr>`).join('')}</tbody>
   </table></div></div>
@@ -259,17 +291,71 @@ function renderDriver(){
 </div>`;
 }
 
+function setAuthMode(mode) {
+  S.authMode = mode;
+  S.msg = {err:'', ok:''};
+  render();
+}
+
 function doLogin(){
   const email=document.getElementById('f-email')?.value.trim();
   const pass=document.getElementById('f-pass')?.value;
-  const u=USERS.find(x=>x.email===email&&x.pass===pass);
-  if(!u){S.msg={err:'البيانات غير صحيحة'};render();return;}
+  const u = getAllUsers().find(x=>x.email===email && x.pass===pass);
+  
+  if(!u){
+    S.msg={err:'البريد الإلكتروني أو كلمة المرور غير صحيحة'};
+    render();
+    return;
+  }
+  
   S.user=u;
+  // حفظ بيانات المستخدم لحمايتها من الخروج عند الـ Refresh
+  localStorage.setItem('car_app_user', JSON.stringify(u));
   requestNotifPermission();
   render();
 }
 
-function logout(){S.user=null;render();}
+async function doRegister(){
+  const name = document.getElementById('r-name')?.value.trim();
+  const email = document.getElementById('r-email')?.value.trim();
+  const pass = document.getElementById('r-pass')?.value;
+  const role = document.getElementById('r-role')?.value;
+
+  if(!name || !email || !pass){
+    S.msg = {err: 'يرجى ملء جميع الحقول المطلوبة'};
+    render();
+    return;
+  }
+
+  const existing = getAllUsers().find(x => x.email === email);
+  if(existing){
+    S.msg = {err: 'هذا البريد الإلكتروني مسجل بالفعل'};
+    render();
+    return;
+  }
+
+  try {
+    const newUser = { name, email, pass, role };
+    const docRef = await window.fb.addDoc(window.fb.collection(window.fb.db, "users"), newUser);
+    newUser.id = docRef.id;
+
+    S.user = newUser;
+    localStorage.setItem('car_app_user', JSON.stringify(newUser));
+    S.msg = {ok: 'تم إنشاء الحساب بنجاح!'};
+    requestNotifPermission();
+    render();
+  } catch(e) {
+    S.msg = {err: 'حدث خطأ أثناء الإنشاء: ' + e.message};
+    render();
+  }
+}
+
+function logout(){
+  S.user=null;
+  localStorage.removeItem('car_app_user');
+  render();
+}
+
 function openModal(){S.showModal=true;render();}
 function closeModal(){S.showModal=false;render();}
 
@@ -299,9 +385,9 @@ async function submitReq(){
 
 async function approve(rId){
   const sel=document.getElementById('ds-'+rId);
-  const dId=parseInt(sel?.value);
+  const dId=sel?.value;
   if(!dId){alert('اختر سائق أولاً');return;}
-  const d=DRIVERS.find(x=>x.userId===dId);
+  const d=getAllUsers().find(x=>x.id===dId);
   await window.fb.updateDoc(window.fb.doc(window.fb.db, "requests", rId), {
     status:'approved',driverId:dId,driverName:d?.name
   });
