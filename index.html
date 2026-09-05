@@ -79,21 +79,68 @@ select.drv-sel{padding:4px 7px;font-size:12px;border-radius:8px;border:1px solid
     navigator.serviceWorker.register('/firebase-messaging-sw.js').catch(()=>{});
   }
 
-  // الاستماع لقائمة المستخدمين المسجلين في Firebase
+  // الاستماع لقائمة المستخدمين
   onSnapshot(collection(db, "users"), (snapshot) => {
     S.dbUsers = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
     render();
   });
 
+  let prevReqsMap = {};
   let isFirstLoad = true;
-  onSnapshot(collection(db, "requests"), (snapshot) => {
-    const prevCount = S.reqs.length;
-    S.reqs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-    if (!isFirstLoad && S.reqs.length > prevCount) {
-      playBeepSound();
-      showPushNotification("تحديث جديد!", "تم إضافة طلب سيارة جديد في النظام.");
+  // متابعة التغييرات وتنبيه كل مستخدم حسب دوره
+  onSnapshot(collection(db, "requests"), (snapshot) => {
+    const newReqs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    
+    if (!isFirstLoad && S.user) {
+      snapshot.docChanges().forEach(change => {
+        const data = change.doc.data();
+        const reqId = change.doc.id;
+
+        if (change.type === "added" && S.user.role === 'admin') {
+          // إشعار للإداري بطلب جديد
+          playBeepSound();
+          showPushNotification("طلب جديد 🚗", `قام ${data.empName} بتقديم طلب سيارة جديد.`);
+        }
+
+        if (change.type === "modified") {
+          const oldData = prevReqsMap[reqId];
+          if (!oldData) return;
+
+          // 1. عند الموافقة وتعيين السائق
+          if (oldData.status === 'pending' && data.status === 'approved') {
+            if (S.user.id === data.empId) {
+              playBeepSound();
+              showPushNotification("تم قبول طلبك ✅", `وافق الإداري على طلبك وتم تعيين السائق ${data.driverName}.`);
+            }
+            if (S.user.id === data.driverId) {
+              playBeepSound();
+              showPushNotification("مهمة توصيل جديدة 🚙", `تم تكليفك برحلة جديدة من ${data.from} إلى ${data.to}.`);
+            }
+          }
+
+          // 2. عند استلام الرحلة وبدء التنفيذ
+          if (oldData.status === 'approved' && data.status === 'in_progress') {
+            if (S.user.id === data.empId || S.user.role === 'admin') {
+              playBeepSound();
+              showPushNotification("الرحلة قيد التنفيذ 🚀", `بدأ السائق ${data.driverName} الرحلة المتجهة إلى ${data.to}.`);
+            }
+          }
+
+          // 3. عند إنهاء الرحلة
+          if (oldData.status === 'in_progress' && data.status === 'completed') {
+            if (S.user.id === data.empId || S.user.role === 'admin') {
+              playBeepSound();
+              showPushNotification("تمت الرحلة 🏁", `أكمل السائق ${data.driverName} الرحلة بنجاح.`);
+            }
+          }
+        }
+      });
     }
+
+    // حفظ الحالة الحالية للطلبات
+    newReqs.forEach(r => { prevReqsMap[r.id] = r; });
+    S.reqs = newReqs;
     isFirstLoad = false;
     render();
   });
@@ -108,12 +155,11 @@ const INITIAL_USERS=[
   {id:'u6',name:'جمال السائق',email:'jamal@company.com',pass:'Driver@1234',role:'driver'},
 ];
 
-// استرجاع جلسة الدخول من localStorage
 const savedUser = JSON.parse(localStorage.getItem('car_app_user') || 'null');
 
 const S={
   user: savedUser,
-  authMode: 'login', // 'login' or 'register'
+  authMode: 'login',
   msg: {err:'', ok:''},
   showModal: false,
   reqs: [],
@@ -140,14 +186,18 @@ function playBeepSound(){
 }
 
 function showPushNotification(title, body) {
-  if (Notification.permission === "granted" && navigator.serviceWorker) {
-    navigator.serviceWorker.ready.then(registration => {
-      registration.showNotification(title, {
-        body: body,
-        icon: 'https://cdn-icons-png.flaticon.com/512/744/744465.png',
-        vibrate: [200, 100, 200]
+  if ("Notification" in window && Notification.permission === "granted") {
+    if (navigator.serviceWorker && navigator.serviceWorker.controller) {
+      navigator.serviceWorker.ready.then(registration => {
+        registration.showNotification(title, {
+          body: body,
+          icon: 'https://cdn-icons-png.flaticon.com/512/744/744465.png',
+          vibrate: [200, 100, 200]
+        });
       });
-    });
+    } else {
+      new Notification(title, { body, icon: 'https://cdn-icons-png.flaticon.com/512/744/744465.png' });
+    }
   }
 }
 
@@ -183,7 +233,7 @@ function renderHome(){
         <div class="hdr-icon ic-b">🚗</div>
         <div style="font-size:20px;font-weight:500;color:#1A1A18">نظام إدارة طلبات السيارات</div>
       </div>
-      <p style="font-size:13px;color:#5F5E5A;line-height:1.6;margin-bottom:16px">نظام متكامل مع حفظ الجلسة وتسجيل الحسابات الجديدة</p>
+      <p style="font-size:13px;color:#5F5E5A;line-height:1.6;margin-bottom:16px">نظام متكامل ومربوط بجميع الإشعارات الصوتية واللحظية لكل أدوار النظام</p>
       <div class="hint-box">
         <b>الحسابات الافتراضية:</b><br>
         إداري: admin@company.com / Admin@1234<br>
@@ -249,6 +299,7 @@ function renderEmployee(){
   <button class="btn btn-blue" style="margin-bottom:12px" onclick="openModal()">+ طلب سيارة جديدة</button>
   <div class="card"><div class="card-body">${myR.map(r=>`<div class="req-item">
     <div class="req-row"><div>من: ${r.from} &rarr; ${r.to}</div>${bdg(r.status)}</div>
+    ${r.driverName?`<div style="font-size:12px;color:#5F5E5A;margin-top:4px">السائق المسؤول: <b>${r.driverName}</b></div>`:''}
   </div>`).join('')||'<div class="empty">لا توجد طلبات</div>'}</div></div>
 </div>`;
 }
@@ -284,9 +335,9 @@ function renderDriver(){
 </div>
 <div class="main">
   <div class="card"><div class="card-body">${myR.map(r=>`<div class="req-item">
-    <div class="req-row"><div>من: ${r.from} &rarr; ${r.to}</div>${bdg(r.status)}</div>
-    ${r.status==='approved'?`<button class="btn btn-blue btn-full" style="margin-top:8px" onclick="startR('${r.id}')">▶ استلام الطلب</button>`:''}
-    ${r.status==='in_progress'?`<button class="btn btn-green btn-full" style="margin-top:8px" onclick="doneR('${r.id}')">✓ تم التنفيذ</button>`:''}
+    <div class="req-row"><div>من: ${r.from} &rarr; ${r.to} (الموظف: ${r.empName})</div>${bdg(r.status)}</div>
+    ${r.status==='approved'?`<button class="btn btn-blue btn-full" style="margin-top:8px" onclick="startR('${r.id}')">▶ استلام الطلب وبدء الرحلة</button>`:''}
+    ${r.status==='in_progress'?`<button class="btn btn-green btn-full" style="margin-top:8px" onclick="doneR('${r.id}')">✓ تم وصول الهدف وتنفيذ الطلب</button>`:''}
   </div>`).join('')||'<div class="empty">لا توجد رحلات حالياً</div>'}</div></div>
 </div>`;
 }
@@ -309,7 +360,6 @@ function doLogin(){
   }
   
   S.user=u;
-  // حفظ بيانات المستخدم لحمايتها من الخروج عند الـ Refresh
   localStorage.setItem('car_app_user', JSON.stringify(u));
   requestNotifPermission();
   render();
