@@ -1,16 +1,19 @@
 {
   "short_name": "طلبات السيارات",
-  "name": "نظام إدارة طلبات السيارات - Hassan Allam",
+  "name": "نظام إدارة طلبات السيارات",
+  "description": "تطبيق إدارة وتنسيق طلبات السيارات والرحلات لموظفي الشركة وسائقيها",
   "icons": [
     {
-      "src": "https://i.ibb.co/vz15Xv2/logo.png",
+      "src": "https://cdn-icons-png.flaticon.com/512/3202/3202926.png",
       "type": "image/png",
-      "sizes": "192x192"
+      "sizes": "192x192",
+      "purpose": "any maskable"
     },
     {
-      "src": "https://i.ibb.co/vz15Xv2/logo.png",
+      "src": "https://cdn-icons-png.flaticon.com/512/3202/3202926.png",
       "type": "image/png",
-      "sizes": "512x512"
+      "sizes": "512x512",
+      "purpose": "any maskable"
     }
   ],
   "start_url": "/",
