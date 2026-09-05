@@ -3,54 +3,57 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>نظام إدارة طلبات السيارات</title>
+<title>نظام إدارة طلبات السيارات - Hassan Allam Construction</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:system-ui,Arial,sans-serif;direction:rtl;background:#F5F5F3;min-height:100vh}
-.hdr{background:#fff;border-bottom:1px solid #E5E5E2;padding:12px 20px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:10}
-.hdr-brand{display:flex;align-items:center;gap:10px}
-.hdr-icon{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px}
-.ic-b{background:#E6F1FB}.ic-p{background:#EEEDFE}.ic-g{background:#EAF3DE}
-.hdr-title{font-size:15px;font-weight:500;color:#1A1A18}
-.hdr-sub{font-size:11px;color:#888780}
-.btn{padding:6px 14px;border-radius:8px;border:1px solid #D3D1C7;background:#fff;color:#1A1A18;cursor:pointer;font-size:13px;font-weight:500;transition:background .15s}
-.btn:hover{background:#F1EFE8}
-.btn-blue{background:#185FA5;color:#fff;border-color:#185FA5}.btn-blue:hover{background:#0C447C}
-.btn-green{background:#3B6D11;color:#fff;border-color:#3B6D11}.btn-green:hover{background:#27500A}
-.btn-sm{padding:4px 10px;font-size:12px}
-.btn-full{width:100%;text-align:center;padding:9px;font-size:14px}
-.main{max-width:920px;margin:0 auto;padding:16px 20px}
-.card{background:#fff;border:1px solid #E5E5E2;border-radius:12px;margin-bottom:12px}
-.card-body{padding:14px 16px}
-.badge{display:inline-flex;align-items:center;padding:2px 9px;border-radius:20px;font-size:11px;font-weight:500}
-.b-pend{background:#FAEEDA;color:#854F0B}
-.b-appr{background:#E6F1FB;color:#0C447C}
-.b-prog{background:#EEEDFE;color:#3C3489}
-.b-done{background:#EAF3DE;color:#27500A}
-.req-item{border:1px solid #E5E5E2;border-radius:8px;padding:12px;margin-bottom:8px}
-.req-row{display:flex;justify-content:space-between;align-items:flex-start}
+body{font-family:'Tajawal',system-ui,sans-serif;direction:rtl;background:#F8FAFC;color:#1E293B;min-height:100vh;display:flex;flex-direction:column}
+.hdr{background:#FFFFFF;border-bottom:1px solid #E2E8F0;padding:12px 24px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:10;box-shadow:0 1px 3px rgba(0,0,0,0.05)}
+.hdr-brand{display:flex;align-items:center;gap:16px}
+.company-logo{height:38px;width:auto;object-fit:contain}
+.brand-divider{width:1px;height:24px;background:#CBD5E1}
+.hdr-title{font-size:16px;font-weight:700;color:#0F172A}
+.hdr-sub{font-size:12px;color:#64748B}
+.by-text{font-size:11px;color:#64748B;font-weight:500;display:inline-block;background:#F1F5F9;padding:2px 8px;border-radius:12px}
+.btn{padding:8px 16px;border-radius:8px;border:1px solid #CBD5E1;background:#fff;color:#0F172A;cursor:pointer;font-size:13px;font-weight:600;font-family:inherit;transition:all .2s ease}
+.btn:hover{background:#F1F5F9;border-color:#94A3B8}
+.btn-blue{background:#1E3A8A;color:#fff;border-color:#1E3A8A}.btn-blue:hover{background:#1E40AF}
+.btn-green{background:#0D9488;color:#fff;border-color:#0D9488}.btn-green:hover{background:#0F766E}
+.btn-sm{padding:5px 12px;font-size:12px}
+.btn-full{width:100%;text-align:center;padding:10px;font-size:14px}
+.main{max-width:1000px;margin:0 auto;padding:24px 20px;flex:1;width:100%}
+.card{background:#fff;border:1px solid #E2E8F0;border-radius:12px;margin-bottom:16px;box-shadow:0 4px 6px -1px rgba(0,0,0,0.05)}
+.card-body{padding:20px}
+.badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700}
+.b-pend{background:#FEF3C7;color:#92400E}
+.b-appr{background:#DBEAFE;color:#1E40AF}
+.b-prog{background:#E0E7FF;color:#3730A3}
+.b-done{background:#D1FAE5;color:#065F46}
+.req-item{border:1px solid #E2E8F0;border-radius:10px;padding:14px;margin-bottom:10px;background:#FAFAFA}
+.req-row{display:flex;justify-content:space-between;align-items:center}
 table{width:100%;border-collapse:collapse;font-size:13px}
-th{text-align:right;padding:8px 10px;color:#888780;font-weight:500;border-bottom:1px solid #E5E5E2;white-space:nowrap}
-td{padding:8px 10px;border-bottom:1px solid #E5E5E2;color:#1A1A18;vertical-align:middle}
-select.drv-sel{padding:4px 7px;font-size:12px;border-radius:8px;border:1px solid #D3D1C7;background:#fff;width:100%}
-.empty{text-align:center;padding:24px;color:#888780;font-size:13px}
-.land{max-width:920px;margin:0 auto;padding:30px 20px}
-.land-grid{display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:start}
-@media(max-width:640px){.land-grid{grid-template-columns:1fr}}
-.auth-card{background:#fff;border:1px solid #E5E5E2;border-radius:12px;padding:20px}
-.auth-tabs{display:flex;gap:8px;margin-bottom:16px;border-bottom:1px solid #E5E5E2;padding-bottom:10px}
-.auth-tab{padding:6px 12px;font-size:13px;font-weight:500;border:none;background:none;cursor:pointer;color:#888780}
-.auth-tab.active{color:#185FA5;border-bottom:2px solid #185FA5}
-.form-grp{margin-bottom:11px}
-.form-lbl{font-size:12px;color:#5F5E5A;display:block;margin-bottom:4px;font-weight:500}
-.form-inp{width:100%;padding:9px 11px;border-radius:8px;border:1px solid #D3D1C7;background:#fff;color:#1A1A18;font-size:13px;font-family:inherit}
-.err-msg{background:#FCEBEB;color:#791F1F;border:1px solid #F7C1C1;border-radius:8px;padding:9px 12px;font-size:12px;margin-bottom:10px}
-.ok-msg{background:#EAF3DE;color:#27500A;border:1px solid #C0DD97;border-radius:8px;padding:9px 12px;font-size:12px;margin-bottom:10px}
-.hint-box{background:#F5F5F3;border-radius:8px;padding:10px 14px;font-size:12px;color:#5F5E5A;margin-top:14px;line-height:1.8;border:1px solid #E5E5E2}
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;z-index:200}
-.modal-box{background:#fff;border:1px solid #E5E5E2;border-radius:12px;padding:20px;width:360px;box-shadow:0 8px 32px rgba(0,0,0,.15)}
-.modal-title{font-size:15px;font-weight:500;color:#1A1A18;margin-bottom:10px}
-.modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:14px}
+th{text-align:right;padding:10px;color:#64748B;font-weight:700;border-bottom:2px solid #E2E8F0;white-space:nowrap}
+td{padding:12px 10px;border-bottom:1px solid #E2E8F0;color:#1E293B;vertical-align:middle}
+select.drv-sel{padding:6px 10px;font-size:12px;border-radius:6px;border:1px solid #CBD5E1;background:#fff;width:100%;font-family:inherit}
+.empty{text-align:center;padding:32px;color:#94A3B8;font-size:14px}
+.land{max-width:960px;margin:40px auto;padding:0 20px}
+.land-grid{display:grid;grid-template-columns:1fr 400px;gap:40px;align-items:center}
+@media(max-width:768px){.land-grid{grid-template-columns:1fr}}
+.auth-card{background:#fff;border:1px solid #E2E8F0;border-radius:16px;padding:28px;box-shadow:0 10px 25px -5px rgba(0,0,0,0.05)}
+.auth-tabs{display:flex;gap:8px;margin-bottom:20px;border-bottom:1px solid #E2E8F0;padding-bottom:10px}
+.auth-tab{padding:8px 16px;font-size:14px;font-weight:600;border:none;background:none;cursor:pointer;color:#64748B;font-family:inherit}
+.auth-tab.active{color:#1E3A8A;border-bottom:2px solid #1E3A8A}
+.form-grp{margin-bottom:14px}
+.form-lbl{font-size:13px;color:#475569;display:block;margin-bottom:6px;font-weight:600}
+.form-inp{width:100%;padding:10px 12px;border-radius:8px;border:1px solid #CBD5E1;background:#fff;color:#0F172A;font-size:13px;font-family:inherit;transition:border-color .2s}
+.form-inp:focus{outline:none;border-color:#1E3A8A}
+.err-msg{background:#FEF2F2;color:#991B1B;border:1px solid #FECACA;border-radius:8px;padding:10px 12px;font-size:12px;margin-bottom:12px}
+.ok-msg{background:#F0FDF4;color:#166534;border:1px solid #BBF7D0;border-radius:8px;padding:10px 12px;font-size:12px;margin-bottom:12px}
+.modal-overlay{position:fixed;inset:0;background:rgba(15,23,42,0.5);display:flex;align-items:center;justify-content:center;z-index:200;backdrop-filter:blur(2px)}
+.modal-box{background:#fff;border-radius:16px;padding:24px;width:400px;box-shadow:0 20px 25px -5px rgba(0,0,0,0.1)}
+.modal-title{font-size:16px;font-weight:700;color:#0F172A;margin-bottom:14px}
+.modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:18px}
+.footer{text-align:center;padding:16px;font-size:12px;color:#64748B;border-top:1px solid #E2E8F0;background:#fff;margin-top:auto}
 </style>
 </head>
 <body>
@@ -79,7 +82,6 @@ select.drv-sel{padding:4px 7px;font-size:12px;border-radius:8px;border:1px solid
     navigator.serviceWorker.register('/firebase-messaging-sw.js').catch(()=>{});
   }
 
-  // الاستماع لقائمة المستخدمين
   onSnapshot(collection(db, "users"), (snapshot) => {
     S.dbUsers = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
     render();
@@ -88,7 +90,6 @@ select.drv-sel{padding:4px 7px;font-size:12px;border-radius:8px;border:1px solid
   let prevReqsMap = {};
   let isFirstLoad = true;
 
-  // متابعة التغييرات وتنبيه كل مستخدم حسب دوره
   onSnapshot(collection(db, "requests"), (snapshot) => {
     const newReqs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
     
@@ -98,7 +99,6 @@ select.drv-sel{padding:4px 7px;font-size:12px;border-radius:8px;border:1px solid
         const reqId = change.doc.id;
 
         if (change.type === "added" && S.user.role === 'admin') {
-          // إشعار للإداري بطلب جديد
           playBeepSound();
           showPushNotification("طلب جديد 🚗", `قام ${data.empName} بتقديم طلب سيارة جديد.`);
         }
@@ -107,7 +107,6 @@ select.drv-sel{padding:4px 7px;font-size:12px;border-radius:8px;border:1px solid
           const oldData = prevReqsMap[reqId];
           if (!oldData) return;
 
-          // 1. عند الموافقة وتعيين السائق
           if (oldData.status === 'pending' && data.status === 'approved') {
             if (S.user.id === data.empId) {
               playBeepSound();
@@ -119,7 +118,6 @@ select.drv-sel{padding:4px 7px;font-size:12px;border-radius:8px;border:1px solid
             }
           }
 
-          // 2. عند استلام الرحلة وبدء التنفيذ
           if (oldData.status === 'approved' && data.status === 'in_progress') {
             if (S.user.id === data.empId || S.user.role === 'admin') {
               playBeepSound();
@@ -127,7 +125,6 @@ select.drv-sel{padding:4px 7px;font-size:12px;border-radius:8px;border:1px solid
             }
           }
 
-          // 3. عند إنهاء الرحلة
           if (oldData.status === 'in_progress' && data.status === 'completed') {
             if (S.user.id === data.empId || S.user.role === 'admin') {
               playBeepSound();
@@ -138,7 +135,6 @@ select.drv-sel{padding:4px 7px;font-size:12px;border-radius:8px;border:1px solid
       });
     }
 
-    // حفظ الحالة الحالية للطلبات
     newReqs.forEach(r => { prevReqsMap[r.id] = r; });
     S.reqs = newReqs;
     isFirstLoad = false;
@@ -147,13 +143,7 @@ select.drv-sel{padding:4px 7px;font-size:12px;border-radius:8px;border:1px solid
 </script>
 
 <script>
-const INITIAL_USERS=[
-  {id:'u1',name:'أحمد الموظف',email:'ahmed@company.com',pass:'Emp@1234',role:'employee'},
-  {id:'u2',name:'فاطمة الموظفة',email:'fatima@company.com',pass:'Emp@1234',role:'employee'},
-  {id:'u4',name:'محمد الإداري',email:'admin@company.com',pass:'Admin@1234',role:'admin'},
-  {id:'u5',name:'عمر السائق',email:'omar@company.com',pass:'Driver@1234',role:'driver'},
-  {id:'u6',name:'جمال السائق',email:'jamal@company.com',pass:'Driver@1234',role:'driver'},
-];
+const LOGO_URL = 'https://i.ibb.co/vz15Xv2/logo.png'; // تم ضبط رابط شعار Hassan Allam Construction
 
 const savedUser = JSON.parse(localStorage.getItem('car_app_user') || 'null');
 
@@ -167,7 +157,7 @@ const S={
 };
 
 function getAllUsers() {
-  return [...INITIAL_USERS, ...S.dbUsers];
+  return S.dbUsers;
 }
 
 function playBeepSound(){
@@ -191,12 +181,12 @@ function showPushNotification(title, body) {
       navigator.serviceWorker.ready.then(registration => {
         registration.showNotification(title, {
           body: body,
-          icon: 'https://cdn-icons-png.flaticon.com/512/744/744465.png',
+          icon: LOGO_URL,
           vibrate: [200, 100, 200]
         });
       });
     } else {
-      new Notification(title, { body, icon: 'https://cdn-icons-png.flaticon.com/512/744/744465.png' });
+      new Notification(title, { body, icon: LOGO_URL });
     }
   }
 }
@@ -215,31 +205,48 @@ function bdg(s){
 
 function today(){const d=new Date();return`${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()}`;}
 
+function renderHeader(){
+  return `
+  <div class="hdr">
+    <div class="hdr-brand">
+      <img src="${LOGO_URL}" alt="Hassan Allam Construction" class="company-logo" onerror="this.style.display='none'"/>
+      <div class="brand-divider"></div>
+      <div>
+        <div class="hdr-title">نظام إدارة الانتقالات والسيارات</div>
+        <div class="by-text">Created by Mohanad Marzok</div>
+      </div>
+    </div>
+    ${S.user ? `<div style="display:flex;align-items:center;gap:12px">
+      <span style="font-size:13px;font-weight:600;color:#334155">${S.user.name}</span>
+      <button class="btn btn-sm" onclick="logout()">خروج</button>
+    </div>` : ''}
+  </div>`;
+}
+
+function renderFooter(){
+  return `<div class="footer">Hassan Allam Construction &copy; 2026 | Created by Mohanad Marzok</div>`;
+}
+
 function render(){
   const app=document.getElementById('app');
-  if(!S.user) app.innerHTML=renderHome();
-  else if(S.user.role==='employee') app.innerHTML=renderEmployee();
-  else if(S.user.role==='admin') app.innerHTML=renderAdmin();
-  else if(S.user.role==='driver') app.innerHTML=renderDriver();
+  let content = '';
+  if(!S.user) content = renderHome();
+  else if(S.user.role==='employee') content = renderEmployee();
+  else if(S.user.role==='admin') content = renderAdmin();
+  else if(S.user.role==='driver') content = renderDriver();
+  
+  app.innerHTML = content + renderFooter();
 }
 
 function renderHome(){
   const isLogin = S.authMode === 'login';
   return`
+${renderHeader()}
 <div class="land">
   <div class="land-grid">
     <div>
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
-        <div class="hdr-icon ic-b">🚗</div>
-        <div style="font-size:20px;font-weight:500;color:#1A1A18">نظام إدارة طلبات السيارات</div>
-      </div>
-      <p style="font-size:13px;color:#5F5E5A;line-height:1.6;margin-bottom:16px">نظام متكامل ومربوط بجميع الإشعارات الصوتية واللحظية لكل أدوار النظام</p>
-      <div class="hint-box">
-        <b>الحسابات الافتراضية:</b><br>
-        إداري: admin@company.com / Admin@1234<br>
-        موظف: ahmed@company.com / Emp@1234<br>
-        سائق: omar@company.com / Driver@1234
-      </div>
+      <div style="font-size:26px;font-weight:700;color:#0F172A;line-height:1.3;margin-bottom:12px">نظام إدارة طلبات السيارات وتتبع الرحلات</div>
+      <p style="font-size:14px;color:#64748B;line-height:1.7;margin-bottom:20px">منصة موحدة لتنسيق رحلات العمل، متابعة طلبات الموظفين، وإرسال الإشعارات التلقائية الفورية للسائقين والإدارة.</p>
     </div>
     <div>
       <div class="auth-card">
@@ -252,15 +259,15 @@ function renderHome(){
         
         ${isLogin ? `
           <div class="form-grp"><label class="form-lbl">البريد الإلكتروني</label>
-          <input class="form-inp" type="email" id="f-email" placeholder="example@company.com"/></div>
+          <input class="form-inp" type="email" id="f-email" placeholder="name@hassanallam.com"/></div>
           <div class="form-grp"><label class="form-lbl">كلمة المرور</label>
           <input class="form-inp" type="password" id="f-pass" placeholder="••••••••"/></div>
-          <button class="btn btn-blue btn-full" onclick="doLogin()">دخول</button>
+          <button class="btn btn-blue btn-full" onclick="doLogin()">دخول للنظام</button>
         ` : `
           <div class="form-grp"><label class="form-lbl">الاسم الكامل</label>
           <input class="form-inp" type="text" id="r-name" placeholder="أدخل اسمك الكامل"/></div>
           <div class="form-grp"><label class="form-lbl">البريد الإلكتروني</label>
-          <input class="form-inp" type="email" id="r-email" placeholder="example@company.com"/></div>
+          <input class="form-inp" type="email" id="r-email" placeholder="name@hassanallam.com"/></div>
           <div class="form-grp"><label class="form-lbl">كلمة المرور</label>
           <input class="form-inp" type="password" id="r-pass" placeholder="••••••••"/></div>
           <div class="form-grp"><label class="form-lbl">نوع الحساب</label>
@@ -281,45 +288,44 @@ function renderEmployee(){
   const u=S.user;
   const myR=S.reqs.filter(r=>r.empId===u.id);
   const modal=S.showModal?`<div class="modal-overlay"><div class="modal-box">
-    <div class="modal-title">طلب سيارة جديدة</div>
-    <div class="form-grp"><label class="form-lbl">من</label><input class="form-inp" id="m-from"/></div>
-    <div class="form-grp"><label class="form-lbl">إلى</label><input class="form-inp" id="m-to"/></div>
-    <div class="form-grp"><label class="form-lbl">السبب</label><textarea class="form-inp" id="m-reason"></textarea></div>
+    <div class="modal-title">تقديم طلب سيارة جديدة</div>
+    <div class="form-grp"><label class="form-lbl">نقطة الانطلاق (من)</label><input class="form-inp" id="m-from" placeholder="مثال: المقر الرئيسي"/></div>
+    <div class="form-grp"><label class="form-lbl">الوجهة (إلى)</label><input class="form-inp" id="m-to" placeholder="مثال: موقع المشروع"/></div>
+    <div class="form-grp"><label class="form-lbl">السبب / ملاحظات</label><textarea class="form-inp" id="m-reason" rows="3"></textarea></div>
     <div class="modal-actions">
       <button class="btn btn-sm" onclick="closeModal()">إلغاء</button>
       <button class="btn btn-blue btn-sm" onclick="submitReq()">إرسال الطلب</button>
     </div>
   </div></div>`:'';
-  return`${modal}
-<div class="hdr">
-  <div class="hdr-brand"><div class="hdr-icon ic-b">🚗</div><div><div class="hdr-title">لوحة الموظف</div><div class="hdr-sub">${u.name}</div></div></div>
-  <button class="btn btn-sm" onclick="logout()">خروج</button>
-</div>
+  return`${renderHeader()}${modal}
 <div class="main">
-  <button class="btn btn-blue" style="margin-bottom:12px" onclick="openModal()">+ طلب سيارة جديدة</button>
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+    <h2 style="font-size:18px;font-weight:700">طلباتي الحالية</h2>
+    <button class="btn btn-blue" onclick="openModal()">+ طلب سيارة جديدة</button>
+  </div>
   <div class="card"><div class="card-body">${myR.map(r=>`<div class="req-item">
-    <div class="req-row"><div>من: ${r.from} &rarr; ${r.to}</div>${bdg(r.status)}</div>
-    ${r.driverName?`<div style="font-size:12px;color:#5F5E5A;margin-top:4px">السائق المسؤول: <b>${r.driverName}</b></div>`:''}
-  </div>`).join('')||'<div class="empty">لا توجد طلبات</div>'}</div></div>
+    <div class="req-row">
+      <div><b>من:</b> ${r.from} &larr; <b>إلى:</b> ${r.to}</div>
+      ${bdg(r.status)}
+    </div>
+    ${r.driverName?`<div style="font-size:12px;color:#64748B;margin-top:6px">السائق المكلف: <b>${r.driverName}</b></div>`:''}
+  </div>`).join('')||'<div class="empty">لا توجد طلبات مسجلة باسمك حالياً</div>'}</div></div>
 </div>`;
 }
 
 function renderAdmin(){
   const drivers = getAllUsers().filter(u => u.role === 'driver');
-  return`
-<div class="hdr">
-  <div class="hdr-brand"><div class="hdr-icon ic-p">🛡️</div><div><div class="hdr-title">لوحة الإداري</div></div></div>
-  <button class="btn btn-sm" onclick="logout()">خروج</button>
-</div>
+  return`${renderHeader()}
 <div class="main">
+  <h2 style="font-size:18px;font-weight:700;margin-bottom:16px">إدارة الطلبات والتكليفات</h2>
   <div class="card"><div class="card-body"><table>
-    <thead><tr><th>الموظف</th><th>الوجهة</th><th>الحالة</th><th>السائق</th><th>إجراء</th></tr></thead>
+    <thead><tr><th>الموظف</th><th>الوجهة</th><th>الحالة</th><th>السائق المكلف</th><th>الإجراء</th></tr></thead>
     <tbody>${S.reqs.map(r=>`<tr>
-      <td>${r.empName}</td>
-      <td>${r.from} → ${r.to}</td>
+      <td><b>${r.empName}</b></td>
+      <td>${r.from} &rarr; ${r.to}</td>
       <td>${bdg(r.status)}</td>
       <td>${r.status==='pending'?`<select class="drv-sel" id="ds-${r.id}"><option value="">اختر سائق</option>${drivers.map(d=>`<option value="${d.id}">${d.name}</option>`).join('')}</select>`:(r.driverName||'—')}</td>
-      <td>${r.status==='pending'?`<button class="btn btn-green btn-sm" onclick="approve('${r.id}')">موافقة وتحويل</button>`:'تم'}</td>
+      <td>${r.status==='pending'?`<button class="btn btn-green btn-sm" onclick="approve('${r.id}')">موافقة وتعيين</button>`:'مكتمل الإجراء'}</td>
     </tr>`).join('')}</tbody>
   </table></div></div>
 </div>`;
@@ -328,17 +334,17 @@ function renderAdmin(){
 function renderDriver(){
   const u=S.user;
   const myR=S.reqs.filter(r=>r.driverId===u.id);
-  return`
-<div class="hdr">
-  <div class="hdr-brand"><div class="hdr-icon ic-g">🚙</div><div><div class="hdr-title">لوحة السائق</div><div class="hdr-sub">${u.name}</div></div></div>
-  <button class="btn btn-sm" onclick="logout()">خروج</button>
-</div>
+  return`${renderHeader()}
 <div class="main">
+  <h2 style="font-size:18px;font-weight:700;margin-bottom:16px">قائمة الرحلات المكلف بها</h2>
   <div class="card"><div class="card-body">${myR.map(r=>`<div class="req-item">
-    <div class="req-row"><div>من: ${r.from} &rarr; ${r.to} (الموظف: ${r.empName})</div>${bdg(r.status)}</div>
-    ${r.status==='approved'?`<button class="btn btn-blue btn-full" style="margin-top:8px" onclick="startR('${r.id}')">▶ استلام الطلب وبدء الرحلة</button>`:''}
-    ${r.status==='in_progress'?`<button class="btn btn-green btn-full" style="margin-top:8px" onclick="doneR('${r.id}')">✓ تم وصول الهدف وتنفيذ الطلب</button>`:''}
-  </div>`).join('')||'<div class="empty">لا توجد رحلات حالياً</div>'}</div></div>
+    <div class="req-row">
+      <div><b>الموظف:</b> ${r.empName} | <b>من:</b> ${r.from} &rarr; <b>إلى:</b> ${r.to}</div>
+      ${bdg(r.status)}
+    </div>
+    ${r.status==='approved'?`<button class="btn btn-blue btn-full" style="margin-top:12px" onclick="startR('${r.id}')">▶ استلام الطلب وبدء الرحلة</button>`:''}
+    ${r.status==='in_progress'?`<button class="btn btn-green btn-full" style="margin-top:12px" onclick="doneR('${r.id}')">✓ إتمام الرحلة بنجاح</button>`:''}
+  </div>`).join('')||'<div class="empty">لا توجد رحلات موجهة إليك حالياً</div>'}</div></div>
 </div>`;
 }
 
@@ -395,7 +401,7 @@ async function doRegister(){
     requestNotifPermission();
     render();
   } catch(e) {
-    S.msg = {err: 'حدث خطأ أثناء الإنشاء: ' + e.message};
+    S.msg = {err: 'حدث خطأ أثناء إنشاء الحساب: ' + e.message};
     render();
   }
 }
@@ -448,7 +454,7 @@ async function startR(rId){
 }
 
 async function doneR(rId){
-  await window.fb.updateDoc(window.fb.doc(window.fb.db, "requests", rId), { status:'completed' });
+  await window.fb.updateDoc(window.fb.doc(window.fb.doc(window.fb.db, "requests", rId)), { status:'completed' });
 }
 
 render();
