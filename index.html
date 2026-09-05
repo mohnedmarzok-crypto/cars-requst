@@ -15,6 +15,7 @@
 
 <!-- Fonts & External Libraries -->
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+<!-- SheetJS Library for Excel Export -->
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
 <style>
@@ -25,7 +26,6 @@ body{font-family:'Tajawal',system-ui,sans-serif;direction:rtl;background:#F8FAFC
 .company-logo{height:38px;width:auto;object-fit:contain}
 .brand-divider{width:1px;height:24px;background:#CBD5E1}
 .hdr-title{font-size:16px;font-weight:700;color:#0F172A}
-.hdr-sub{font-size:12px;color:#64748B}
 .by-text{font-size:11px;color:#64748B;font-weight:500;display:inline-block;background:#F1F5F9;padding:2px 8px;border-radius:12px}
 .btn{padding:8px 16px;border-radius:8px;border:1px solid #CBD5E1;background:#fff;color:#0F172A;cursor:pointer;font-size:13px;font-weight:600;font-family:inherit;transition:all .2s ease}
 .btn:hover{background:#F1F5F9;border-color:#94A3B8}
@@ -217,9 +217,14 @@ function bdg(s){
 
 function today(){const d=new Date();return`${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()}`;}
 
-function exportToExcel() {
+window.exportToExcel = function() {
+  if (!typeof XLSX !== 'undefined' && !window.XLSX) {
+    alert("جارٍ تحميل مكتبة التصدير، يرجى المحاولة بعد لحظات...");
+    return;
+  }
+
   if (!S.reqs || S.reqs.length === 0) {
-    alert("لا توجد بيانات أو رحلات لتصديرها حالياً.");
+    alert("لا توجد رحلات مسجلة في النظام لتصديرها حالياً.");
     return;
   }
 
@@ -262,7 +267,7 @@ function exportToExcel() {
 
   const dateStr = new Date().toISOString().split('T')[0];
   XLSX.writeFile(workbook, `تقرير_طلبات_السيارات_${dateStr}.xlsx`);
-}
+};
 
 function renderHeader(){
   return `
@@ -378,7 +383,7 @@ function renderAdmin(){
 <div class="main">
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px;">
     <h2 style="font-size:18px;font-weight:700">إدارة الطلبات والتكليفات</h2>
-    <button class="btn btn-green" onclick="exportToExcel()" style="display:flex;align-items:center;gap:6px">
+    <button class="btn btn-green" onclick="exportToExcel()" style="display:inline-flex;align-items:center;gap:6px;">
       📊 تصدير تقرير Excel
     </button>
   </div>
