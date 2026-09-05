@@ -1,16 +1,16 @@
 {
   "short_name": "طلبات السيارات",
-  "name": "نظام إدارة طلبات السيارات",
-  "description": "تطبيق إدارة وتنسيق طلبات السيارات والرحلات لموظفي الشركة وسائقيها",
+  "name": "نظام إدارة طلبات السيارات - Hassan Allam",
+  "description": "تطبيق إدارة وتنسيق طلبات السيارات وتتبع الرحلات الميدانية لشركة حسن علام للمقاولات",
   "icons": [
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/3202/3202926.png",
+      "src": "https://img.icons8.com/isometric/512/car.png",
       "type": "image/png",
       "sizes": "192x192",
       "purpose": "any maskable"
     },
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/3202/3202926.png",
+      "src": "https://img.icons8.com/isometric/512/car.png",
       "type": "image/png",
       "sizes": "512x512",
       "purpose": "any maskable"
